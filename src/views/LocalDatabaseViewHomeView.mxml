@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		actionBarVisible="false" 
+		creationComplete="init();">
+	
+	<fx:Script>
+		<![CDATA[
+			import events.SQLConnectionIsOpen;
+			import model.SQLEditHandler;
+			import model.SQLViewHandler;
+			import model.SQLConnectionHandler;
+			
+			import mx.collections.ArrayCollection;
+			
+			private var sqlEditInstance:SQLEditHandler;
+			
+			private var sqlViewInstance:SQLViewHandler;
+			
+			public function init():void
+			{
+				var aConn:SQLConnectionHandler = SQLConnectionHandler.getInstance();
+				aConn.initConnection();
+				
+				sqlEditInstance = SQLEditHandler.getInstance();
+				
+				sqlViewInstance = SQLViewHandler.getInstance();
+				sqlViewInstance.addEventListener(SQLConnectionIsOpen.READERCOMPLETE, showUser);
+				sqlViewInstance.initSQLView();
+				
+			}
+			
+			public function insertUser():void
+			{
+				sqlEditInstance.insertUser(textInput.text);
+				
+				sqlViewInstance.initSQLView();
+				textInput.text = "";
+			}
+			
+			public function showUser(e:SQLConnectionIsOpen):void
+			{
+				list.dataProvider = sqlViewInstance.getCollectionArray();
+			}
+		]]>
+	</fx:Script>
+	
+	<s:Group>
+		<s:TextInput id="textInput" 
+					 skinClass="spark.skins.mobile.TextInputSkin" 
+					 softKeyboardType="url"  
+					 needsSoftKeyboard="true"
+					 x="20" y="25"
+					 width="{navigator.width - 40}"/>
+		
+		<s:Button label="OK"
+				  click="insertUser();"
+				  x="20" y="90"
+				  width="{navigator.width - 40}"/>
+		
+		<s:List id="list" 
+				x="20" 
+				y="190" 
+				width="{navigator.width - 40}" 
+				height="200"/>
+
+	</s:Group>
+</s:View>
